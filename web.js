@@ -7,7 +7,8 @@ app.get('/', function(request, response) {
 
 	//  response.send('Hello World2!');
 	var buf = new Buffer(1000);
-	var myRawData = fs.createReadStream('index.html');
+	//var myRawData = fs.createReadStream('index.html');
+	var myRawData = fs.read('index.html',buf,0);
 	response.send(myRawData.toString());
 	
 

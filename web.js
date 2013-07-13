@@ -9,7 +9,7 @@ app.get('/', function(request, response) {
 	var buf = new Buffer(1000);
 	//var myRawData = fs.createReadStream('index.html');
 	var text=fs.readFileSync('index.html');
-	response.send(text);
+	response.send(text.toString());
 
 //	response.send(myRawData.toString());
 	

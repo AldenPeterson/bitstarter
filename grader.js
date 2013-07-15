@@ -64,7 +64,7 @@ var clone = function(fn) {
 };
 
 
-
+/*
 function getResp(url){
     restler.get(url).on('complete', function(response){
     processResponse(response);
@@ -85,38 +85,27 @@ function processResponse(data) {
   //});
 
 }
+*/
+var checkUrl = function(url, checksfile) {
+    rest.get(url).on('complete', function(data) {
+	$ = cheerio.load(data);
+	var checks = loadChecks(checksfile).sort();
+	var out = {};
+	for(var ii in checks) {
+	    var present = $(checks[ii]).length > 0;
+	    out[checks[ii]] = present;
+	}
+	var outJson = JSON.stringify(out, null, 4);
+	console.log(outJson);
+    });
+}
 
 if(require.main == module) {
-
-
     program
-//	.option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
-//	.option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
 	.option('-c, --checks <check_file>', 'Path to checks.json')
-	.option('f, --file <html_file>', 'Path to html file')
+	.option('-u, --url <check_url>','url to check')
+	.option('-f, --file <html_file>', 'Path to html file')
 	.parse(process.argv);
-
-
-
-//restler.get(program.file).on('complete', function(result) {
-  //if (result instanceof Error) {
-    //sys.puts('Error: ' + result.message);
-    //this.retry(5000); // try again after 5 sec
-//console.log("no file found for:" + program.file);
-//} else {
-
-getResp(program.file);
-
-//console.log(str);
-
-//fs.writeFile(__dirname + '/myHtml.html',myData, function(err) {
-  //if (err) throw err;
-//  console.log('It\'s saved!');
-//});
-
-
- // }
-//});
 
     var checkJson = checkHtmlFile('myHtml.html', program.checks);
     var outJson = JSON.stringify(checkJson, null, 4);

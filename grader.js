@@ -1,31 +1,9 @@
 #!/usr/bin/env node
-/*
-Automatically grade files for the presence of specified HTML tags/attributes.
-Uses commander.js and cheerio. Teaches command line application development
-and basic DOM parsing.
-
-References:
-
- + cheerio
-   - https://github.com/MatthewMueller/cheerio
-   - http://encosia.com/cheerio-faster-windows-friendly-alternative-jsdom/
-   - http://maxogden.com/scraping-with-node.html
-
- + commander.js
-   - https://github.com/visionmedia/commander.js
-   - http://tjholowaychuk.com/post/9103188408/commander-js-nodejs-command-line-interfaces-made-easy
-
- + JSON
-   - http://en.wikipedia.org/wiki/JSON
-   - https://developer.mozilla.org/en-US/docs/JSON
-   - https://developer.mozilla.org/en-US/docs/JSON#JSON_in_Firefox_2
-*/
 
 var fs = require('fs');
 var program = require('commander');
 var cheerio = require('cheerio');
 var restler = require('restler');
-//var sys = require('util');
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
 
@@ -64,37 +42,15 @@ var clone = function(fn) {
 };
 
 
-/*
-function getResp(url){
-    restler.get(url).on('complete', function(response){
-    processResponse(response);
-  });
-}
-
-var myData = {};
-
-// data will be a Buffer
-function processResponse(data) {
-  // converting Buffers to strings is expensive, so I prefer
-  // to do it explicitely when required
-  var str = data.toString();
-
-//  fs.writeFile(__dirname + 'myHtml.html', data.toString(), function(err){
-  //    if(err) throw err;
-    //  console.log('it\'s saved!');
-  //});
-
-}
-*/
 var checkUrl = function(url, checksfile) {
-    rest.get(url).on('complete', function(data) {
+    restler.get(url).on('complete', function(data) {
 	$ = cheerio.load(data);
 	var checks = loadChecks(checksfile).sort();
 	var out = {};
 	for(var ii in checks) {
-	    var present = $(checks[ii]).length > 0;
-	    out[checks[ii]] = present;
-	}
+		var present = $(checks[ii]).length > 0;
+		out[checks[ii]] = present;
+	    }
 	var outJson = JSON.stringify(out, null, 4);
 	console.log(outJson);
     });
@@ -102,25 +58,18 @@ var checkUrl = function(url, checksfile) {
 
 if(require.main == module) {
     program
+	.option('-f, --file <html_file>', 'Path to index.html')
+	.option('-u, --url <url>', 'URL to index.html')
 	.option('-c, --checks <check_file>', 'Path to checks.json')
-	.option('-u, --url <check_url>','url to check')
-	.option('-f, --file <html_file>', 'Path to html file')
 	.parse(process.argv);
 
-    var checkJson = checkHtmlFile('myHtml.html', program.checks);
-    var outJson = JSON.stringify(checkJson, null, 4);
-    console.log(outJson);
+    if (program.url) {
+	checkUrl(program.url, program.checks);
+    } else {
+	checkHtmlFile (program.file, program.checks);
 
-
-} else {
-
-    //debug testing
-    var checkJson = checkHtmlFile("index.html","checks.json");
-    var outJson = JSON.stringify(checkJson, null, 4);
-    console.log(outJson);
-
-    console.log(UrlExists("test"));
-
-    exports.checkHtmlFile = checkHtmlFile;
-
+	var checkJson = checkHtmlFile(program.file, program.checks);
+	var outJson = JSON.stringify(checkJson, null, 4);
+	console.log(outJson);
+    }
 }
